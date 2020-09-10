@@ -104,11 +104,11 @@ tracePath <- function(car, node)
 
 getNearestPackage <- function(car, packages)
 { 
-  print(packages)
-  cat("\n")
+  # print(packages)
+  # cat("\n")
   
   availablePackages <- which(packages[, 5] == 0)
-  print(availablePackages)
+  # print(availablePackages)
   
   minDist <- 10000
   nearestPackage <- -1
@@ -129,10 +129,51 @@ getNearestPackage <- function(car, packages)
   return(nearestPackage)
 }
 
+doAStar <- function(roads, car, packages)
+{ 
+  # cat("Car xPos: ", car$x, " car yPos: ", car$y)
+  initializeNodes(.GlobalEnv$dim)
+  
+  .GlobalEnv$nodeMatrix[[car$x, car$y]]$parentPos$x <- car$x
+  .GlobalEnv$nodeMatrix[[car$x, car$y]]$parentPos$y <- car$y
+  .GlobalEnv$nodeMatrix[[car$x, car$y]]$visited <- TRUE
+  
+  .GlobalEnv$closedList <- list()
+  .GlobalEnv$closedList[[length(.GlobalEnv$closedList) + 1]] <- .GlobalEnv$nodeMatrix[[car$x, car$y]]
+  
+  
+  if(car$load == 0)
+  {
+    .GlobalEnv$nearestPackage <- getNearestPackage(car, packages)
+    # cat("\nNearest package: ", nearestPackage)
+    goalNode <- nodeMatrix[packages[.GlobalEnv$nearestPackage, 1], packages[.GlobalEnv$nearestPackage, 2]]
+    # cat("\nShowing goal node from doAStar() when car load 0: ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y)  
+  }else
+  {
+    # cat("\nDropping off package")
+    goalNode <- nodeMatrix[packages[.GlobalEnv$nearestPackage, 3], packages[.GlobalEnv$nearestPackage, 4]]
+    # cat("\nShowing goal node from doAStar(): ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y)
+  }
+  
+  # cat("\nShowing goal node from doAStar(): ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y, "\n")
+  currentNode <- .GlobalEnv$closedList[[1]]
+  # .GlobalEnv$foundGoal <- F
+  .GlobalEnv$openList <- list()
+  
+  if(car$x == goalNode[[1]]$pos$x & car$y == goalNode[[1]]$pos$y)
+  {
+    car$nextMove = 5
+    return(car)
+  }
+  
+  car = getPathToGoal(currentNode, goalNode, car, roads)
+  # print(car)
+  return(car)
+}
 
 getPathToGoal <- function(currentNode, goalNode, car, roads)
 {
-  cat("\nGoal node x, y: ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y, "\n")
+  # cat("\nGoal node x, y: ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y, "\n")
   while(T)
   {
     # check the node on the right
@@ -223,9 +264,9 @@ getPathToGoal <- function(currentNode, goalNode, car, roads)
     
     # cat("\nGoal node xPos: ", goalNode[[1]]$pos$x, ", Goal node yPos: ", goalNode[[1]]$pos$y)
     # cat("\nLenght of openList: ", length(.GlobalEnv$openList))
-    # cat("Current Node x, y: ", currentNode$pos$x, ", ", currentNode$pos$y)
+    # cat("\nCurrent Node x, y: ", currentNode$pos$x, ", ", currentNode$pos$y,"\n")
     
-    # if(car$x == 2 & car$y == 7)
+    # if(car$x == 9 & car$y == 9)
     # {
     #   # cat("\nLenght of openList: ", length(.GlobalEnv$openList))
     #   plotNodeData()
@@ -249,45 +290,16 @@ getPathToGoal <- function(currentNode, goalNode, car, roads)
   # a = readline("Press enter: ")
 }
 
-doAStar <- function(roads, car, packages)
-{ 
-  # cat("Car xPos: ", car$x, " car yPos: ", car$y)
-  initializeNodes(.GlobalEnv$dim)
-  
-  .GlobalEnv$nodeMatrix[[car$x, car$y]]$parentPos$x <- car$x
-  .GlobalEnv$nodeMatrix[[car$x, car$y]]$parentPos$y <- car$y
-  .GlobalEnv$nodeMatrix[[car$x, car$y]]$visited <- TRUE
-  
-  .GlobalEnv$closedList <- list()
-  .GlobalEnv$closedList[[length(.GlobalEnv$closedList) + 1]] <- .GlobalEnv$nodeMatrix[[car$x, car$y]]
-  
-  
-  if(car$load == 0)
-  {
-    .GlobalEnv$nearestPackage <- getNearestPackage(car, packages)
-    # cat("\nNearest package: ", nearestPackage)
-    goalNode <- nodeMatrix[packages[.GlobalEnv$nearestPackage, 1], packages[.GlobalEnv$nearestPackage, 2]]
-    # cat("\nShowing goal node from doAStar() when car load 0: ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y)  
-  }else
-  {
-    # cat("\nDropping off package")
-    goalNode <- nodeMatrix[packages[.GlobalEnv$nearestPackage, 3], packages[.GlobalEnv$nearestPackage, 4]]
-    # cat("\nShowing goal node from doAStar(): ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y)
-  }
-  
-  # cat("\nShowing goal node from doAStar(): ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y, "\n")
-  currentNode <- .GlobalEnv$closedList[[1]]
-  # .GlobalEnv$foundGoal <- F
-  .GlobalEnv$openList <- list()
-  
-  car = getPathToGoal(currentNode, goalNode, car, roads)
-  # print(car)
-  return(car)
+# runDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T)
+testDM(myFunction = doAStar, verbose = 0, returnVec = T, n = 500, seed = 21, timeLimit = 250)
+
+# runMyDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T, roads = .GlobalEnv$roads, packages = .GlobalEnv$packages)
+
+
+for(i in 1 : 100)
+{
+  runDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0, del = 5, verbose = T)
 }
-
-runDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T)
-
-
 # plotNodeData <- function()
 # {
 #   for(i in 1:.GlobalEnv$dim)
@@ -297,7 +309,7 @@ runDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0
 #       node = .GlobalEnv$nodeMatrix[[i, j]]
 #       if(node$visited == T)
 #       {
-#         points(node$pos$x, node$pos$y, pch = 16, col = "blue", cex = 1)
+#         points(node$pos$x, node$pos$y, pch = 16, col = "blue", cex = 2)
 #       }else
 #       {
 #         points(node$pos$x, node$pos$y, pch = 16, col = "orange", cex = 1)
@@ -306,9 +318,35 @@ runDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0
 #   }
 # }
 # roads = makeRoadMatrices(dim)
+# packages <- matrix(NA, nrow = 5, ncol = 5, byrow = T)
+# packages[1, 1] = 9
+# packages[1, 2] = 9
+# packages[1, 3] = 4
+# packages[1, 4] = 6
+# packages[1, 5] = 0
+# packages[2, 1] = 10
+# packages[2, 2] = 3
+# packages[2, 3] = 9
+# packages[2, 4] = 9
+# packages[2, 5] = 0
+# packages[3, 1] = 10
+# packages[3, 2] = 3
+# packages[3, 3] = 8
+# packages[3, 4] = 1
+# packages[3, 5] = 0
+# packages[4, 1] = 8
+# packages[4, 2] = 7
+# packages[4, 3] = 8
+# packages[4, 4] = 2
+# packages[4, 5] = 0
+# packages[5, 1] = 4
+# packages[5, 2] = 10
+# packages[5, 3] = 8
+# packages[5, 4] = 9
+# packages[5, 5] = 0
+# print(packages)
 # packages = matrix(sample(1:dim, replace = T, 5 * 5), ncol = 5)
 # packages[, 5] = rep(0, 5)
-# runMyDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T, roads = .GlobalEnv$roads, packages = .GlobalEnv$packages)
 #  
 # 
 # runMyDeliveryMan <- function (carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T, roads = roads, packages = packages)
