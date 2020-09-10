@@ -285,26 +285,26 @@ doAStar <- function(roads, car, packages)
   return(car)
 }
 
-plotNodeData <- function()
-{
-  for(i in 1:.GlobalEnv$dim)
-  {
-    for(j in 1:.GlobalEnv$dim)
-    {
-      node = .GlobalEnv$nodeMatrix[[i, j]]
-      if(node$visited == T)
-      {
-        points(node$pos$x, node$pos$y, pch = 16, col = "blue", cex = 1)
-      }else
-      {
-        points(node$pos$x, node$pos$y, pch = 16, col = "orange", cex = 1)
-      }
-    }
-  }
-}
-
 runDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T)
 
+
+# plotNodeData <- function()
+# {
+#   for(i in 1:.GlobalEnv$dim)
+#   {
+#     for(j in 1:.GlobalEnv$dim)
+#     {
+#       node = .GlobalEnv$nodeMatrix[[i, j]]
+#       if(node$visited == T)
+#       {
+#         points(node$pos$x, node$pos$y, pch = 16, col = "blue", cex = 1)
+#       }else
+#       {
+#         points(node$pos$x, node$pos$y, pch = 16, col = "orange", cex = 1)
+#       }
+#     }
+#   }
+# }
 # roads = makeRoadMatrices(dim)
 # packages = matrix(sample(1:dim, replace = T, 5 * 5), ncol = 5)
 # packages[, 5] = rep(0, 5)
