@@ -1,6 +1,6 @@
 # A* algorithm to the delivery-man problem
 
-# Function:
+# Functions:
 
 ### initializeNodes
 Creates a nodeMatrix that contains a list with informaion about each node
