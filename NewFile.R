@@ -105,6 +105,7 @@ tracePath <- function(car, node)
 getNearestPackage <- function(car, packages)
 { 
   # print(packages)
+  # readline("Press enter: ")
   # cat("\n")
   
   availablePackages <- which(packages[, 5] == 0)
@@ -115,7 +116,9 @@ getNearestPackage <- function(car, packages)
   for(i in 1 : length(availablePackages))
   {
     nextPackage <- list(x = packages[availablePackages[i], 1], y = packages[availablePackages[i], 2])
-    dist <- abs(car$x - nextPackage$x) + abs(car$y - nextPackage$y)
+    nextDropOff <- list(x = packages[availablePackages[i], 3], y = packages[availablePackages[i], 4])
+    dist <- abs(car$x - nextPackage$x) + abs(car$y - nextPackage$y) +
+      abs(nextDropOff$x - nextPackage$x) + abs(nextDropOff$y - nextPackage$y)
     
     if(dist < minDist)
     {
@@ -131,7 +134,9 @@ getNearestPackage <- function(car, packages)
 
 doAStar <- function(roads, car, packages)
 { 
-  # cat("Car xPos: ", car$x, " car yPos: ", car$y)
+  # cat("Car xPos: ", car$x, " car yPos: ", car$y,"\n")
+  # print(roads)
+  # print(packages)
   initializeNodes(.GlobalEnv$dim)
   
   .GlobalEnv$nodeMatrix[[car$x, car$y]]$parentPos$x <- car$x
@@ -290,16 +295,42 @@ getPathToGoal <- function(currentNode, goalNode, car, roads)
   # a = readline("Press enter: ")
 }
 
+# testDM(myFunction = doAStar, verbose = 0, returnVec = T, n = 500, seed = 21, timeLimit = 250)
+
 # runDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T)
-testDM(myFunction = doAStar, verbose = 0, returnVec = T, n = 500, seed = 21, timeLimit = 250)
 
-# runMyDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T, roads = .GlobalEnv$roads, packages = .GlobalEnv$packages)
+# for(i in 1 : 100)
+# {
+#   x = runDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0, del = 5, verbose = T)
+#   if(is.na(x))
+#   {
+#     break
+#   }
+# }
 
+# x = foo(12)
+# 
+# print(x)
+# 
+# length(x)
+# 
+# if(is.na(x))
+# {
+#   print("X is NA")
+# }
+# 
+# foo <- function(x)
+# {
+#   if(x == 1)
+#   {
+#     print("asd")
+#   }
+#   else
+#   {
+#     return(NA)
+#   }
+# }
 
-for(i in 1 : 100)
-{
-  runDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0, del = 5, verbose = T)
-}
 # plotNodeData <- function()
 # {
 #   for(i in 1:.GlobalEnv$dim)
@@ -318,46 +349,151 @@ for(i in 1 : 100)
 #   }
 # }
 # roads = makeRoadMatrices(dim)
-# packages <- matrix(NA, nrow = 5, ncol = 5, byrow = T)
-# packages[1, 1] = 9
-# packages[1, 2] = 9
-# packages[1, 3] = 4
-# packages[1, 4] = 6
-# packages[1, 5] = 0
-# packages[2, 1] = 10
-# packages[2, 2] = 3
-# packages[2, 3] = 9
-# packages[2, 4] = 9
-# packages[2, 5] = 0
-# packages[3, 1] = 10
-# packages[3, 2] = 3
-# packages[3, 3] = 8
-# packages[3, 4] = 1
-# packages[3, 5] = 0
-# packages[4, 1] = 8
-# packages[4, 2] = 7
-# packages[4, 3] = 8
-# packages[4, 4] = 2
-# packages[4, 5] = 0
-# packages[5, 1] = 4
-# packages[5, 2] = 10
-# packages[5, 3] = 8
-# packages[5, 4] = 9
-# packages[5, 5] = 0
-# print(packages)
-# packages = matrix(sample(1:dim, replace = T, 5 * 5), ncol = 5)
-# packages[, 5] = rep(0, 5)
-#  
-# 
+# rm(packages)
+packages <- matrix(NA, nrow = 5, ncol = 5, byrow = T)
+packages[1, 1] = 10
+packages[1, 2] = 2
+packages[1, 3] = 5
+packages[1, 4] = 7
+packages[1, 5] = 0
+packages[2, 1] = 8
+packages[2, 2] = 6
+packages[2, 3] = 8
+packages[2, 4] = 8
+packages[2, 5] = 0
+packages[3, 1] = 6
+packages[3, 2] = 10
+packages[3, 3] = 7
+packages[3, 4] = 8
+packages[3, 5] = 0
+packages[4, 1] = 6
+packages[4, 2] = 7
+packages[4, 3] = 7
+packages[4, 4] = 2
+packages[4, 5] = 0
+packages[5, 1] = 8
+packages[5, 2] = 4
+packages[5, 3] = 2
+packages[5, 4] = 7
+packages[5, 5] = 0
+print(packages)
+
+car <- list(x = 1, y = 1)
+
+getShortestCircuit <- function(circuit, row, cost, dim, connectivityMatrix)
+{ 
+  # cat("This: ", circuit[length(circuit)])
+  # print(connectivityMatrix[[1, tail(path)]])
+  # print(circuit)
+  circuit[length(circuit) + 1] = row
+  if(length(circuit) == dim)
+  {
+    x <- list(circuit = circuit, cost = cost)
+    .GlobalEnv$listOfCircuits[[length(listOfCircuits) + 1]] <- x
+    # circuit <- circuit[1 : length(circuit) - 1]
+    # return(circuit)
+    return(1)
+  }
+  
+  for(col in 1 : dim)
+  {
+    if(connectivityMatrix[[row, col]] > -1 & !(col %in% circuit))
+    { 
+      # cat("\nCircuit before recursive call: ", circuit, "\n")
+      # circuit[length(circuit) + 1] <- col
+      getShortestCircuit(circuit, col, cost + connectivityMatrix[[row, col]], dim, connectivityMatrix)
+      # cat("\nCircuit after recursive call: ", circuit, "\n")
+    }
+  }
+  
+}
+
+foo <- function(packages, car, dim)
+{
+  availablePackages <- which(packages[, 5] == 0)
+  
+  minDist <- 10000
+  nearestPackage <- -1
+  for(i in 1 : length(availablePackages))
+  {
+    nextPackage <- list(x = packages[availablePackages[i], 1], y = packages[availablePackages[i], 2])
+    nextDropOff <- list(x = packages[availablePackages[i], 3], y = packages[availablePackages[i], 4])
+    dist <- abs(car$x - nextPackage$x) + abs(car$y - nextPackage$y) +
+      abs(nextDropOff$x - nextPackage$x) + abs(nextDropOff$y - nextPackage$y)
+    
+    if(dist < minDist)
+    {
+      minDist <- dist
+      nearestPackage <- availablePackages[i]
+    }
+  }
+  cat("The nearest package: ", nearestPackage, ", with a distance of: ", minDist)
+  cat("\nPackage coordinates: ", packages[nearestPackage, 1], ", ", packages[nearestPackage, 2])
+  cat("\nPackage drop off point: ", packages[nearestPackage, 3], ", ", packages[nearestPackage, 4], "\n")
+  
+  print("This is the packages matrix: \n" )
+  print(packages)
+  tempMatrix <- packages
+  
+  print("\nThis is the tempMatrix: \n")
+  tempRow <- tempMatrix[1, 1 : 5]
+  tempMatrix[1, 1 : 5] <- packages[nearestPackage, 1 : 5]
+  tempMatrix[nearestPackage, 1 : 5] <- tempRow
+  print(tempMatrix)
+  
+  packageCoordList <- list()
+  
+  for(i in 1 : 5)
+  {
+    packageCoord <- c(tempMatrix[i, 1], tempMatrix[i, 2])
+    dropOffCoord <- c(tempMatrix[i, 3], tempMatrix[i, 4])
+    packageCoordList[[length(packageCoordList)+1]] <- packageCoord
+    packageCoordList[[length(packageCoordList)+1]] <- dropOffCoord
+  }
+  
+  # print(packageCoordList)
+  connectivityMatrix <- matrix(-1, nrow = dim, ncol = dim, byrow = T)
+  
+  for(i in 1 : dim)
+  {
+    for(j in 1 : dim)
+    {
+      if(j!=1 & ((i %% 2 == 1 & j == (i + 1)) | (i %% 2 == 0 & j %% 2 == 1) & i != 1))
+      {
+        # connection <- 1
+        coord1 <- packageCoordList[[i]]
+        coord2 <- packageCoordList[[j]]
+        cost <- abs(coord1[1] - coord2[1]) + abs(coord1[2] - coord2[2])
+        connectivityMatrix[[i, j]] <- cost
+      }
+    }
+  }
+  
+  print(connectivityMatrix)
+  
+  getShortestCircuit(c(1), 2, connectivityMatrix[[1, 2]], dim, connectivityMatrix)
+  print(.GlobalEnv$listOfCircuits)
+  .GlobalEnv$listOfCircuits <- .GlobalEnv$listOfCircuits[order(sapply(.GlobalEnv$listOfCircuits, `[[`, i = "cost"))]
+}
+
+listOfCircuits <- list()
+foo(.GlobalEnv$packages, car, .GlobalEnv$dim)
+
+# # packages = matrix(sample(1:dim, replace = T, 5 * 5), ncol = 5)
+# # packages[, 5] = rep(0, 5)
+# #  
+# # 
+# runMyDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T, roads = .GlobalEnv$roads,  packages = .GlobalEnv$packages)
+
 # runMyDeliveryMan <- function (carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T, roads = roads, packages = packages)
 # {
-#   # roads = makeRoadMatrices(dim)
+#   roads = makeRoadMatrices(dim)
 #   car = list(x = 1, y = 1, wait = 0, load = 0, nextMove = NA,
 #              mem = list())
 #   # packages = matrix(sample(1:dim, replace = T, 5 * del), ncol = 5)
 #   # packages[, 5] = rep(0, del)
 #   for (i in 1:turns) {
-#     # roads = updateRoads(roads$hroads, roads$vroads)
+#     roads = updateRoads(roads$hroads, roads$vroads)
 #     if (doPlot) {
 #       makeDotGrid(dim, i)
 #       plotRoads(roads$hroads, roads$vroads)
@@ -385,8 +521,8 @@ for(i in 1 : 100)
 #           return(i)
 #         }
 #       }
-#       car = carReady(roads, car, packages)
-#       car = processNextMove(car, roads, dim)
+#       # car = carReady(roads, car, packages)
+#       # car = processNextMove(car, roads, dim)
 #     }
 #     else {
 #       car$wait = car$wait - 1
