@@ -2,10 +2,10 @@ library(DeliveryMan)
 
 dim <- 10
 nodeMatrix <- matrix(list(), nrow = dim, ncol = dim, byrow = T)
-nearestPackage <- 1
+nearestPackage <- -1
 deliveryMatrix <- matrix(NA, nrow = 5, ncol = 6, byrow = T)
 listOfCircuits <- list()
-actualPackage  <- 1
+actualPackage  <- -1
 
 initializeNodes <- function(dim)
 {
@@ -100,203 +100,6 @@ getShortestCircuit <- function(circuit, row, cost, dim, connectivityMatrix)
       getShortestCircuit(circuit, col, cost + connectivityMatrix[[row, col]], dim, connectivityMatrix)
     }
   }
-  
-}
-
-createDeliveryMatrix <- function(car, packages, dim)
-{
-  availablePackages <- which(packages[, 5] == 0)
-  
-  minDist <- 10000
-  nearestPackage <- -1
-  for(i in 1 : length(availablePackages))
-  {
-    nextPackage <- list(x = packages[availablePackages[i], 1], y = packages[availablePackages[i], 2])
-    nextDropOff <- list(x = packages[availablePackages[i], 3], y = packages[availablePackages[i], 4])
-    dist <- abs(car$x - nextPackage$x) + abs(car$y - nextPackage$y) +
-      abs(nextDropOff$x - nextPackage$x) + abs(nextDropOff$y - nextPackage$y)
-    
-    if(dist < minDist)
-    {
-      minDist <- dist
-      nearestPackage <- availablePackages[i]
-    }
-  }
-  # cat("The nearest package: ", nearestPackage, ", with a distance of: ", minDist)
-  # cat("\nPackage coordinates: ", packages[nearestPackage, 1], ", ", packages[nearestPackage, 2])
-  # cat("\nPackage drop off point: ", packages[nearestPackage, 3], ", ", packages[nearestPackage, 4], "\n")
-  
-  # print("This is the packages matrix: \n" )
-  # print(packages)
-  tempMatrix <- matrix(NA, nrow = 5, ncol = 6, byrow = T)
-  
-  # print("\nThis is the tempMatrix: \n")
-  # tempRow <- tempMatrix[1, 1 : 5]
-  # tempMatrix[1, 1 : 5] <- packages[nearestPackage, 1 : 5]
-  # tempMatrix[nearestPackage, 1 : 5] <- tempRow
-  # print(tempMatrix)
-  
-  for(i in 1 : 5)
-  {
-    if(i == 1 || i == nearestPackage)
-    {
-      tempMatrix[1, 1 : 5] <- packages[nearestPackage, 1 : 5]
-      tempMatrix[nearestPackage, 1 : 5] <- packages[1, 1 : 5]
-      tempMatrix[1, 6] <- nearestPackage
-      tempMatrix[nearestPackage, 6] <- 1
-    }
-    else
-    {
-      tempMatrix[i, 1 : 5] <- packages[i, 1 : 5]
-      tempMatrix[i, 6] <- i
-    }
-  }
-  
-  # print("\nThis is the tempMatrix: \n")
-  # print(tempMatrix)
-  
-  packageCoordList <- list()
-  
-  for(i in 1 : 5)
-  {
-    packageCoord <- c(tempMatrix[i, 1], tempMatrix[i, 2])
-    dropOffCoord <- c(tempMatrix[i, 3], tempMatrix[i, 4])
-    packageCoordList[[length(packageCoordList)+1]] <- packageCoord
-    packageCoordList[[length(packageCoordList)+1]] <- dropOffCoord
-  }
-  
-  # print(packageCoordList)
-  connectivityMatrix <- matrix(-1, nrow = dim, ncol = dim, byrow = T)
-  
-  for(i in 1 : dim)
-  {
-    for(j in 1 : dim)
-    {
-      if(j!=1 & ((i %% 2 == 1 & j == (i + 1)) | (i %% 2 == 0 & j %% 2 == 1) & i != 1))
-      {
-        # connection <- 1
-        coord1 <- packageCoordList[[i]]
-        coord2 <- packageCoordList[[j]]
-        cost <- abs(coord1[1] - coord2[1]) + abs(coord1[2] - coord2[2])
-        connectivityMatrix[[i, j]] <- cost
-      }
-    }
-  }
-  
-  # print(connectivityMatrix)
-  
-  getShortestCircuit(c(1), 2, connectivityMatrix[[1, 2]], dim, connectivityMatrix)
-  # print(.GlobalEnv$listOfCircuits)
-  .GlobalEnv$listOfCircuits <- .GlobalEnv$listOfCircuits[order(sapply(.GlobalEnv$listOfCircuits, `[[`, i = "cost"))]
-  
-  cheapestCircuit <- .GlobalEnv$listOfCircuits[[1]]
-  
-  # print(cheapestCircuit[[1]][3])
-  packageOrder <- c()
-  
-  for(i in 1 : length(cheapestCircuit[[1]]))
-  {
-    if(cheapestCircuit[[1]][i] %% 2 == 1)
-    {
-      # print(cheapestCircuit[[1]][i])
-      packageOrder[length(packageOrder) + 1] <- cheapestCircuit[[1]][i]
-    }
-  }
-  
-  # cat("\n This is the package order: ")
-  # print(packageOrder)
-  
-  for(i in 1:length(packageOrder))
-  {
-    if(packageOrder[i] == 1)packageOrder[i] <- 1
-    else if(packageOrder[i] == 3)packageOrder[i] <- 2
-    else if(packageOrder[i] == 5)packageOrder[i] <- 3
-    else if(packageOrder[i] == 7)packageOrder[i] <- 4
-    else if(packageOrder[i] == 9)packageOrder[i] <- 5
-  }
-  
-  # print("Temp Matrix: \n")
-  # print(tempMatrix)
-  # .GlobalEnv$deliveryMatrix <- matrix(0, nrow = 5, ncol = 6, byrow = T)
-  
-  for(i in 1 : 5)
-  {
-    .GlobalEnv$deliveryMatrix[i, 1 : 6] <- tempMatrix[packageOrder[i], 1 : 6]
-    # x <- which(deliveryMatrix[,] == packages[,])
-    # x = duplicated(rbind(.GlobalEnv$deliveryMatrix, packages))
-    # cat("\nRow: ", i, " of Delivery Matrix is equal to row: ", deliveryMatrix[i, 6], " of packages matrix")
-  }
-  
-  # print("\n")
-  # print("Package order:")
-  # print(packageOrder)
-  # cat("The nearest package: ", nearestPackage, ", with a distance of: ", minDist,"\n")
-  # print("Actual packages matrix: ")
-  # print(packages)
-  # # print("tempMatrix")
-  # # print(tempMatrix)
-  # print("New packages matrix:")
-  # print(.GlobalEnv$deliveryMatrix)
-  # print("done")
-}
-
-doAStar <- function(roads, car, packages)
-{ 
-  print("This is the delivery matrix: ")
-  print(deliveryMatrix)
-  print("Actual packages array: ")
-  print(packages)
-  print(roads)
-  initializeNodes(.GlobalEnv$dim)
-  
-  .GlobalEnv$nodeMatrix[[car$x, car$y]]$parentPos$x <- car$x
-  .GlobalEnv$nodeMatrix[[car$x, car$y]]$parentPos$y <- car$y
-  .GlobalEnv$nodeMatrix[[car$x, car$y]]$visited <- TRUE
-  
-  .GlobalEnv$closedList <- list()
-  .GlobalEnv$closedList[[length(.GlobalEnv$closedList) + 1]] <- .GlobalEnv$nodeMatrix[[car$x, car$y]]
-  
-  if(length(car$mem) == 0)
-  {
-    createDeliveryMatrix(car, packages, .GlobalEnv$dim)
-    car$mem[[1]] = 1
-  }
-  
-  .GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 5] <- packages[.GlobalEnv$actualPackage, 5]
-  
-  if(car$load == 0)
-  { 
-    x <- which(.GlobalEnv$deliveryMatrix[, 5] == 0)
-    
-    # print("Available packages: ")
-    # print(x)
-    .GlobalEnv$nearestPackage <- x[1]
-    .GlobalEnv$actualPackage <- .GlobalEnv$deliveryMatrix[nearestPackage, 6]
-    # cat("\nNearest package: ", nearestPackage, "\n")
-    goalNode <- nodeMatrix[.GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 1], .GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 2]]
-    # cat("Row from delivery matrix: ", .GlobalEnv$nearestPackage, " row from packages matrix: ", .GlobalEnv$actualPackage)
-    # cat("\nShowing goal node from doAStar() when car load 0: ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y)  
-  }else
-  {
-    # cat("\nDropping off package")
-    goalNode <- nodeMatrix[.GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 3], .GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 4]]
-    # cat("\nShowing goal node from doAStar(): ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y)
-  }
-  
-  # cat("\nShowing goal node from doAStar(): ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y, "\n")
-  currentNode <- .GlobalEnv$closedList[[1]]
-  # .GlobalEnv$foundGoal <- F
-  .GlobalEnv$openList <- list()
-  
-  if(car$x == goalNode[[1]]$pos$x & car$y == goalNode[[1]]$pos$y)
-  {
-    car$nextMove = 5
-    return(car)
-  }
-  
-  car = getPathToGoal(currentNode, goalNode, car, roads)
-  # print(car)
-  return(car)
 }
 
 getPathToGoal <- function(currentNode, goalNode, car, roads)
@@ -394,10 +197,10 @@ getPathToGoal <- function(currentNode, goalNode, car, roads)
     # cat("\nLenght of openList: ", length(.GlobalEnv$openList))
     # cat("\nCurrent Node x, y: ", currentNode$pos$x, ", ", currentNode$pos$y,"\n")
     
-    # if(car$x == 9 & car$y == 9)
+    # if(car$x == 8 & car$y == 4)
     # {
     #   # cat("\nLenght of openList: ", length(.GlobalEnv$openList))
-    #   plotNodeData()
+    #   # plotNodeData()
     #   cat("\nThis is the Goal node x, y: ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y)
     #   cat("\nCurrent Node x, y: ", currentNode$pos$x, ", ", currentNode$pos$y)
     #   cat("\nNearest package: ", .GlobalEnv$nearestPackage)
@@ -418,9 +221,356 @@ getPathToGoal <- function(currentNode, goalNode, car, roads)
   # a = readline("Press enter: ")
 }
 
-testDM(myFunction = doAStar, verbose = 2, returnVec = T, n = 1, seed = 5, timeLimit = 250)
+createDeliveryMatrix <- function(car, packages, dim)
+{ 
+  packageCoordList <- list()
+  
+  for(i in 1 : 5)
+  {
+    packageCoord <- c(packages[i, 1], packages[i, 2])
+    dropOffCoord <- c(packages[i, 3], packages[i, 4])
+    packageCoordList[[length(packageCoordList)+1]] <- packageCoord
+    packageCoordList[[length(packageCoordList)+1]] <- dropOffCoord
+  }
+  
+  # print(packageCoordList)
+  
+  connectivityMatrix <- matrix(-1, nrow = dim, ncol = dim, byrow = T)
+  
+  for(i in 1 : dim)
+  {
+    for(j in 1 : dim)
+    {
+      if((i %% 2 == 1 & j == i + 1) | (i %% 2 == 0 & j %% 2 == 1 & j != i - 1))
+      {
+        coord1 <- packageCoordList[[i]]
+        coord2 <- packageCoordList[[j]]
+        cost <- abs(coord1[1] - coord2[1]) + abs(coord1[2] - coord2[2])
+        connectivityMatrix[[i, j]] <- cost
+      }
+    }
+  }
+  
+  # print(connectivityMatrix)
+  
+  for(i in 1 : dim)
+  {
+    if(i %% 2 == 0)next
+    startingCost <- abs(car$x - packageCoordList[[i]][1]) + abs(car$y - packageCoordList[[i]][2])
+    getShortestCircuit(c(i), i + 1, startingCost, dim, connectivityMatrix)
+  }
+  
+  .GlobalEnv$listOfCircuits <- .GlobalEnv$listOfCircuits[order(sapply(.GlobalEnv$listOfCircuits, `[[`, i = "cost"))]
+  packageOrder <- c()
+  
+  for(i in 1 : length(.GlobalEnv$listOfCircuits[[1]][[1]]))
+  {
+    if(.GlobalEnv$listOfCircuits[[1]][[1]][i] %% 2 == 1)
+    {
+      if(.GlobalEnv$listOfCircuits[[1]][[1]][i] == 1)packageOrder[length(packageOrder) + 1] <- 1
+      else if(.GlobalEnv$listOfCircuits[[1]][[1]][i] == 3)packageOrder[length(packageOrder) + 1] <- 2
+      else if(.GlobalEnv$listOfCircuits[[1]][[1]][i] == 5)packageOrder[length(packageOrder) + 1] <- 3
+      else if(.GlobalEnv$listOfCircuits[[1]][[1]][i] == 7)packageOrder[length(packageOrder) + 1] <- 4
+      else if(.GlobalEnv$listOfCircuits[[1]][[1]][i] == 9)packageOrder[length(packageOrder) + 1] <- 5
+    }
+  }
+  
+  for(i in 1 : 5)
+  {
+    .GlobalEnv$deliveryMatrix[i, 1 : 5] <- packages[packageOrder[i], 1 : 5]
+    .GlobalEnv$deliveryMatrix[i, 6] <- packageOrder[i]
+  }
+  # 
+  # # print("\n")
+  # # print("Package order:")
+  # # print(packageOrder)
+  # # cat("The nearest package: ", nearestPackage, ", with a distance of: ", minDist,"\n")
+  # # print("Actual packages matrix: ")
+  # # print(packages)
+  # # # # print("tempMatrix")
+  # # # # print(tempMatrix)
+  # print("New packages matrix:")
+  # print(.GlobalEnv$deliveryMatrix)
+  # # print("done")
+}
 
-# runDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T)
+doAStar <- function(roads, car, packages)
+{ 
+  initializeNodes(.GlobalEnv$dim)
+  .GlobalEnv$nodeMatrix[[car$x, car$y]]$parentPos$x <- car$x
+  .GlobalEnv$nodeMatrix[[car$x, car$y]]$parentPos$y <- car$y
+  .GlobalEnv$nodeMatrix[[car$x, car$y]]$visited <- TRUE
+  
+  .GlobalEnv$closedList <- list()
+  .GlobalEnv$closedList[[length(.GlobalEnv$closedList) + 1]] <- .GlobalEnv$nodeMatrix[[car$x, car$y]]
+  if(length(car$mem) == 0)
+  {
+    createDeliveryMatrix(car, packages, .GlobalEnv$dim)
+    car$mem[[1]] = 1
+  }
+  
+  # readline("Press enter: ")
+  
+  # cat("\nHello Nearest package: ", .GlobalEnv$nearestPackage, " actual package: ", .GlobalEnv$actualPackage)
+  
+  if(car$load > 0)
+  { 
+    # cat("\nThe car is carrying package: ", car$load)
+    # cat("\nThe actualpackage: ", .GlobalEnv$actualPackage, "\n")
+    # print("Delivery Matrix: ")
+    # print(.GlobalEnv$deliveryMatrix)
+    # print("Actual Matrix: ")
+    # print(packages)
+    # cat("\nLOL: ", .GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 6])
+    if(.GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 6] != car$load)
+    {
+      # print("Hey")
+      .GlobalEnv$actualPackage <- car$load
+      .GlobalEnv$nearestPackage <- which(.GlobalEnv$deliveryMatrix[, 6] == car$load) 
+    }
+    # cat("Row from delivery matrix: ", .GlobalEnv$nearestPackage, " row from packages matrix: ", .GlobalEnv$actualPackage)
+    # cat("\nHello Nearest package: ", .GlobalEnv$nearestPackage, " actual package: ", .GlobalEnv$actualPackage)
+  }
+  
+  .GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 5] <- packages[.GlobalEnv$actualPackage, 5]
+  
+  if(car$load == 0)
+  { 
+    # print("This is happening")
+    x <- which(.GlobalEnv$deliveryMatrix[, 5] == 0)
+    
+    .GlobalEnv$nearestPackage <- x[1]
+    .GlobalEnv$actualPackage <- .GlobalEnv$deliveryMatrix[nearestPackage, 6]
+    # cat("\nNearest package: ", nearestPackage, "actual package: ", .GlobalEnv$actualPackage,"\n")
+    goalNode <- .GlobalEnv$nodeMatrix[.GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 1], .GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 2]]
+    # print(nodeMatrix[.GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 1], .GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 2]])
+    # print(goalNode)
+    # cat("\nShowing goal node from doAStar() when car load 0: ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y)  
+  }else
+  {
+    # print("This is happening")
+    goalNode <- .GlobalEnv$nodeMatrix[.GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 3], .GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 4]]
+    # print(nodeMatrix[.GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 3], .GlobalEnv$deliveryMatrix[.GlobalEnv$nearestPackage, 4]])
+    # cat("\nShowing goal node from doAStar(): ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y, "\n")
+  }
+  
+  # cat("\nShowing goal node from doAStar(): ", goalNode[[1]]$pos$x, ", ", goalNode[[1]]$pos$y, "\n")
+  currentNode <- .GlobalEnv$closedList[[1]]
+  # .GlobalEnv$foundGoal <- F
+  .GlobalEnv$openList <- list()
+  
+  # print("This is the goal node: ")
+  # print(goalNode)
+  # readline("Press enter: ")
+  
+  if(car$x == goalNode[[1]]$pos$x & car$y == goalNode[[1]]$pos$y)
+  {
+    # cat("\nNearest package: ", nearestPackage, "actual package: ", .GlobalEnv$actualPackage,"\n")
+    # print("Actual packages")
+    # print(packages)
+    # print("Delivery Matrix")
+    # print(deliveryMatrix)
+    # cat("Car load: ", car$load)
+    car$nextMove = 5
+    # readline("Press enter: ")
+    return(car)
+  }
+  
+  car = getPathToGoal(currentNode, goalNode, car, roads)
+  # print("This is the delivery matrix: ")
+  # print(deliveryMatrix)
+  # print("Actual packages array: ")
+  # print(packages)
+  # readline("Press enter hiyah: ")
+  return(car)
+}
+
+set.seed(7774)
+runDeliveryMan(carReady = doAStar, dim = 10, turns = 2000, doPlot = T, pause = 0.1, del = 5, verbose = T)
+# testDM(myFunction = doAStar, verbose = 2, returnVec = T, n = 10, seed = 21, timeLimit = 250)
+# packages = matrix(sample(1:dim, replace = T, 5 * 5), ncol = 5)
+# packages[, 5] = rep(0, 5)
+# print(packages)
+# roads = makeRoadMatrices(dim)
+# roads = updateRoads(roads$hroads, roads$vroads)
+# print(roads)
+# rm(packages)
+
+# packages = matrix(sample(1:dim, replace = T, 5 * 5), ncol = 5)
+# packages[, 5] = rep(0, 5)
+# packages[1, 1] = 8
+# packages[1, 2] = 3
+# packages[1, 3] = 8
+# packages[1, 4] = 7
+# packages[1, 5] = 0
+# packages[2, 1] = 1
+# packages[2, 2] = 1
+# packages[2, 3] = 7
+# packages[2, 4] = 2
+# packages[2, 5] = 0
+# packages[3, 1] = 5
+# packages[3, 2] = 2
+# packages[3, 3] = 9
+# packages[3, 4] = 2
+# packages[3, 5] = 0
+# packages[4, 1] = 6
+# packages[4, 2] = 5
+# packages[4, 3] = 4
+# packages[4, 4] = 6
+# packages[4, 5] = 0
+# packages[5, 1] = 6
+# packages[5, 2] = 2
+# packages[5, 3] = 9
+# packages[5, 4] = 2
+# packages[5, 5] = 0
+# print(packages)
+# car <- list(x = 1, y = 1)
+
+# foo(car, packages, .GlobalEnv$dim)
+# 
+# foo <- function(car, packages, dim)
+# { 
+# # print(packages)
+# # readline("Press enter: ")
+# # availablePackages <- which(packages[, 5] == 0)
+# # cat("\nThis is car xpos: ", car$x)
+# 
+# minDist <- 10000
+# nearestPackage <- -1
+# for(i in 1 : 5)
+# {
+#   packagePos <- list(x = packages[i, 1], y = packages[i, 2])
+#   packageDropOff <- list(x = packages[i, 3], y = packages[i, 4])
+#   dist <- abs(car$x - packagePos$x) + abs(car$y - packagePos$y) +
+#     abs(packageDropOff$x - packagePos$x) + abs(packageDropOff$y - packagePos$y)
+#   
+#   # cat("\nThis is i: ", i, " dist: ", dist)
+#   
+#   if(dist < minDist)
+#   {
+#     minDist <- dist
+#     nearestPackage <- i
+#   }
+# }
+# # cat("\nPackage coordinates: ", packages[nearestPackage, 1], ", ", packages[nearestPackage, 2])
+# # cat("\nPackage drop off point: ", packages[nearestPackage, 3], ", ", packages[nearestPackage, 4], "\n")
+# # cat("\nThe nearest package: ", nearestPackage, ", with a distance of: ", minDist, "\n")
+# # print("This is the packages matrix:" )
+# # print(packages)
+# 
+# tempMatrix <- matrix(NA, nrow = 5, ncol = 6, byrow = T)
+# 
+# # print("\nThis is the tempMatrix: \n")
+# # tempRow <- tempMatrix[1, 1 : 5]
+# # tempMatrix[1, 1 : 5] <- packages[nearestPackage, 1 : 5]
+# # tempMatrix[nearestPackage, 1 : 5] <- tempRow
+# # print(tempMatrix)
+# 
+# for(i in 1 : 5)
+# {
+#   if(i == 1 || i == nearestPackage)
+#   {
+#     tempMatrix[1, 1 : 5] <- packages[nearestPackage, 1 : 5]
+#     tempMatrix[nearestPackage, 1 : 5] <- packages[1, 1 : 5]
+#     tempMatrix[1, 6] <- nearestPackage
+#     tempMatrix[nearestPackage, 6] <- 1
+#   }
+#   else
+#   {
+#     tempMatrix[i, 1 : 5] <- packages[i, 1 : 5]
+#     tempMatrix[i, 6] <- i
+#   }
+# }
+# 
+# # cat("\nThis is the tempMatrix: \n")
+# # print(tempMatrix)
+# # cat("\nActual packages matrix: \n")  
+# # print(packages)
+# # cat("The nearest package: ", nearestPackage, ", with a distance of: ", minDist, "\n")
+# 
+# packageCoordList <- list()
+# 
+# for(i in 1 : 5)
+# {
+#   packageCoord <- c(tempMatrix[i, 1], tempMatrix[i, 2])
+#   dropOffCoord <- c(tempMatrix[i, 3], tempMatrix[i, 4])
+#   packageCoordList[[length(packageCoordList)+1]] <- packageCoord
+#   packageCoordList[[length(packageCoordList)+1]] <- dropOffCoord
+# }
+# 
+# # print(packageCoordList)
+# connectivityMatrix <- matrix(-1, nrow = dim, ncol = dim, byrow = T)
+# 
+# for(i in 1 : dim)
+# {
+#   for(j in 1 : dim)
+#   {
+#     if(j!=1 & ((i %% 2 == 1 & j == (i + 1)) | (i %% 2 == 0 & j %% 2 == 1) & i != 1))
+#     {
+#       # connection <- 1
+#       coord1 <- packageCoordList[[i]]
+#       coord2 <- packageCoordList[[j]]
+#       cost <- abs(coord1[1] - coord2[1]) + abs(coord1[2] - coord2[2])
+#       connectivityMatrix[[i, j]] <- cost
+#     }
+#   }
+# }
+# 
+# # print(connectivityMatrix)
+# 
+# getShortestCircuit(c(1), 2, connectivityMatrix[[1, 2]], dim, connectivityMatrix)
+# # print(.GlobalEnv$listOfCircuits)
+# .GlobalEnv$listOfCircuits <- .GlobalEnv$listOfCircuits[order(sapply(.GlobalEnv$listOfCircuits, `[[`, i = "cost"))]
+# 
+# cheapestCircuit <- .GlobalEnv$listOfCircuits[[1]]
+# 
+# # print(cheapestCircuit[[1]][3])
+# packageOrder <- c()
+# 
+# for(i in 1 : length(cheapestCircuit[[1]]))
+# {
+#   if(cheapestCircuit[[1]][i] %% 2 == 1)
+#   {
+#     # print(cheapestCircuit[[1]][i])
+#     packageOrder[length(packageOrder) + 1] <- cheapestCircuit[[1]][i]
+#   }
+# }
+# 
+# # cat("\n This is the package order: ")
+# # print(packageOrder)
+# 
+# for(i in 1:length(packageOrder))
+# {
+#   if(packageOrder[i] == 1)packageOrder[i] <- 1
+#   else if(packageOrder[i] == 3)packageOrder[i] <- 2
+#   else if(packageOrder[i] == 5)packageOrder[i] <- 3
+#   else if(packageOrder[i] == 7)packageOrder[i] <- 4
+#   else if(packageOrder[i] == 9)packageOrder[i] <- 5
+# }
+# 
+# # print("Temp Matrix: \n")
+# # print(tempMatrix)
+# # .GlobalEnv$deliveryMatrix <- matrix(0, nrow = 5, ncol = 6, byrow = T)
+# 
+# for(i in 1 : 5)
+# {
+#   .GlobalEnv$deliveryMatrix[i, 1 : 6] <- tempMatrix[packageOrder[i], 1 : 6]
+#   # x <- which(deliveryMatrix[,] == packages[,])
+#   # x = duplicated(rbind(.GlobalEnv$deliveryMatrix, packages))
+#   # cat("\nRow: ", i, " of Delivery Matrix is equal to row: ", deliveryMatrix[i, 6], " of packages matrix")
+# }
+# 
+# # print("\n")
+# # print("Package order:")
+# # print(packageOrder)
+# # cat("The nearest package: ", nearestPackage, ", with a distance of: ", minDist,"\n")
+# # print("Actual packages matrix: ")
+# # print(packages)
+# # print("New packages matrix:")
+# # print(.GlobalEnv$deliveryMatrix)
+# # print("done")
+# }
+
 
 # shit <- matrix(1, nrow = 5, ncol = 5, byrow = T)
 # deliveryMatrix[, 5] <- shit[, 5]
@@ -478,35 +628,6 @@ testDM(myFunction = doAStar, verbose = 2, returnVec = T, n = 1, seed = 5, timeLi
 #   }
 # }
 # roads = makeRoadMatrices(dim)
-# packages <- matrix(NA, nrow = 5, ncol = 5, byrow = T)
-# packages[1, 1] = 10
-# packages[1, 2] = 2
-# packages[1, 3] = 5
-# packages[1, 4] = 7
-# packages[1, 5] = 0
-# packages[2, 1] = 8
-# packages[2, 2] = 6
-# packages[2, 3] = 8
-# packages[2, 4] = 8
-# packages[2, 5] = 0
-# packages[3, 1] = 6
-# packages[3, 2] = 10
-# packages[3, 3] = 7
-# packages[3, 4] = 8
-# packages[3, 5] = 0
-# packages[4, 1] = 6
-# packages[4, 2] = 7
-# packages[4, 3] = 7
-# packages[4, 4] = 2
-# packages[4, 5] = 0
-# packages[5, 1] = 8
-# packages[5, 2] = 4
-# packages[5, 3] = 2
-# packages[5, 4] = 7
-# packages[5, 5] = 0
-# print(packages)
-
-# car <- list(x = 1, y = 1)
 
 # getNearestPackage <- function(car, packages)
 # { 
