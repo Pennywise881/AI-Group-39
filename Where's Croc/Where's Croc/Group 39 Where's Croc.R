@@ -37,7 +37,7 @@ getTransitionMatrix <- function(edges, numOfWaterHoles)
   # }
 }
 
-getStateVector <- function(positions, numOfWaterHoles)
+initStateVector <- function(positions, numOfWaterHoles)
 {
   if(positions[1] == positions[2])
   {
@@ -155,7 +155,7 @@ findCroc <- function(moveInfo, readings, positions, edges, probs)
   if(moveInfo$mem$status == 0)
   {
     # print("Hey")
-    prevStateVector <- getStateVector(positions, 40)
+    prevStateVector <- initStateVector(positions, 40)
   }
   else 
   {
