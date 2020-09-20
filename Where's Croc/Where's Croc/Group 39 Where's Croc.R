@@ -3,7 +3,7 @@ library(WheresCroc)
 # return the transition matrix
 getTransitionMatrix <- function(edges, numOfWaterHoles)
 {
-  transitionMatrix <- matrix(0, nrow = numOfWaterHoles, ncol = numOfWaterHoles)
+  transitionMatrix <- matrix(0, nrow = numOfWaterHoles, ncol = numOfWaterHoles, byrow = T)
   # print("These are the edges: ")
   # print(edges)
   
@@ -79,7 +79,7 @@ getObservationsMatrix <- function(readings, probs, numOfWaterHoles)
 
 findShortestPath <- function(startNode, goalNode, edges)
 {
-  cat("This is the startNode, ", startNode, ", this is the goal node: ", goalNode, "\n")
+  # cat("This is the startNode, ", startNode, ", this is the goal node: ", goalNode, "\n")
   queue <- list(list(node = startNode, parent = startNode))
 
   counter <- 1
@@ -144,36 +144,51 @@ tracePath <- function(startNode, node, queue, path)
 findCroc <- function(moveInfo, readings, positions, edges, probs)
 { 
   transitionMatrix <- getTransitionMatrix(edges, 40)
-  # print("here is the transition matrix: ")
-  # print(transitionMatrix)
   
-  # print(typeof(moveInfo$mem$status))
-  
-  # print(prevState)
-  # print(moveInfo)
-  
-  if(moveInfo$mem$status == 0)
+  if(length(moveInfo$mem$status) == 1)
   {
-    # print("Hey")
     prevStateVector <- getStateVector(positions, 40)
   }
   else 
   {
     prevStateVector <- moveInfo$mem$status
-    prevStateVector[positions[1]] <- 0
-    prevStateVector[positions[2]] <- 0
+    if(!is.na(positions[1]))
+    {
+      if(positions[1] < 0)prevStateVector[-positions[1]] <- 1
+      else prevStateVector[positions[1]] <- 0
+    }
+    if(!is.na(positions[2]))
+    {
+      if(positions[2] < 0)prevStateVector[-positions[2]] <- 1
+      else prevStateVector[positions[2]] <- 0
+    }
   }
   
+  # prevStateVector <- t(prevStateVector)
   # print("This is the current state vector: ")
   # print(prevStateVector)
+  # readline("Press enter: ")
   
   observationsMatrix <- getObservationsMatrix(readings, probs, 40)
   
-  currentStateVector <- prevStateVector %*% transitionMatrix %*% observationsMatrix
-  print("This is the current state vector: ")
-  print(currentStateVector)
+  if(!is.na(positions[1]) && positions[1] < 0)
+  {
+    currentStateVector <- rep.int(0, 40)
+    currentStateVector[-positions[1]] <- 1
+  }
+  if(!is.na(positions[2]) && positions[2] < 0)
+  {
+    currentStateVector <- rep.int(0, 40)
+    currentStateVector[-positions[2]] <- 1
+  }
+  else
+  {
+    currentStateVector <- prevStateVector %*% transitionMatrix %*% observationsMatrix 
+  }
+  # print("This is the current state vector: ")
+  # print(currentStateVector)
   
-  cat("\nWater hole with highest likelihood: ", which.max(currentStateVector), " with a value of: ", max(currentStateVector), "\n")
+  # cat("\nWater hole with highest likelihood: ", which.max(currentStateVector), " with a value of: ", max(currentStateVector), "\n")
   
   moveInfo$mem$status <- currentStateVector
   # print("This is the move info: ")
@@ -181,8 +196,8 @@ findCroc <- function(moveInfo, readings, positions, edges, probs)
   
   goalNode <- which.max(currentStateVector)
   pathToGoal <- findShortestPath(positions[3], goalNode, edges)
-  print("This is the path to goal: ")
-  print(pathToGoal)
+  # print("This is the path to goal: ")
+  # print(pathToGoal)
   
   if(length(pathToGoal) == 1)
   {
@@ -202,8 +217,10 @@ findCroc <- function(moveInfo, readings, positions, edges, probs)
   return(moveInfo)
 }
 
+# set.seed(18751)
+# runWheresCroc(findCroc, doPlot = T, showCroc = T, pause = 1, verbose = T, returnMem = F, mem = NA)
 
-runWheresCroc(findCroc, doPlot = T, showCroc = T, pause = 1, verbose = T, returnMem = F, mem = NA)
+testWC(findCroc, verbose = 2, returnVec = T, n = 500, seed = 21, timeLimit = 300)
 
 # runMyWheresCroc(manualWC, doPlot = T, showCroc = T, pause = 1, verbose = T, returnMem = F, mem = NA)
 
