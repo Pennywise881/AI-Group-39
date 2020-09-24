@@ -158,6 +158,25 @@ learnFunction <- function(hist)
 
   # x <- paste("(Pn = ",toString(1), "| TB = 1 | LC = 1)", sep = "")
   # print(x)
+  # print(XRTable[, "(Pn = 0 | TB = 0 | LC = 0 | XR = 1)"])
+  
+  TempTable <- matrix(data = NA, nrow = 1, ncol = 4, byrow = T)
+  colnames(TempTable) <- c("(Mean 0)", "(SD 0)", "(Mean 1)", "(SD 1)")
+  
+  mean_0 <- mean(hist[hist[, 1] == 0, 2])
+  sd_0 <- sd(hist[hist[, 1] == 0, 2])
+  mean_1 <- mean(hist[hist[, 1] == 1, 2])
+  sd_1 <- sd(hist[hist[, 1] == 1, 2])
+  # cat("\n\nmean: ", mean_0)
+  # cat("\n\nsd: ", sd_0)
+  
+  TempTable[1, 1] <- mean_0
+  TempTable[1, 2] <- sd_0
+  TempTable[1, 3] <- mean_1
+  TempTable[1, 4] <- sd_1
+  
+  cat("\n\nTable for Te(Temperature): \n")
+  print(TempTable)
 }
 
 learnFunction(hist)
