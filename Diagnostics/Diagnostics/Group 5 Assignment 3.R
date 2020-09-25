@@ -4,32 +4,32 @@ library(Diagnostics)
 
 learnFunction <- function(hist)
 {
-  print(names(hist))
+  # print(names(hist))
   
-  cat("Table for Pn(Pneumonia): \n")
+  # cat("Table for Pn(Pneumonia): \n")
   PnTable <- matrix(data = NA, nrow = 1, ncol = 2, byrow = T)
   PnTable[1, 1] <- (length(which(hist[, 1] == 0)) + 1) / (length(which(hist[, 1] == 0)) + 1 + length(which(hist[, 1] == 1)) + 1)
   PnTable[1, 2] <- (length(which(hist[, 1] == 1)) + 1) / (length(which(hist[, 1] == 0)) + 1 + length(which(hist[, 1] == 1)) + 1)
-  colnames(PnTable) <- c("Pn = 0", "Pn = 1")
-  print(PnTable)
+  colnames(PnTable) <- c("(Pn=0)", "(Pn=1)")
+  # print(PnTable)
   
-  cat("\n\nTable for VTB(Visited a TB location): \n")
+  # cat("\n\nTable for VTB(Visited a TB location): \n")
   VTBTable <- matrix(data = NA, nrow = 1, ncol = 2, byrow = T)
   VTBTable[1, 1] <- (length(which(hist[, 3] == 0)) + 1) / (length(which(hist[, 3] == 0)) + 1 + length(which(hist[, 3] == 1)) + 1)
   VTBTable[1, 2] <- (length(which(hist[, 3] == 1)) + 1) / (length(which(hist[, 3] == 0)) + 1 + length(which(hist[, 3] == 1)) + 1)
-  colnames(VTBTable) <- c("VTB = 0", "VTB = 1")
-  print(VTBTable)
+  colnames(VTBTable) <- c("(VTB=0)", "(VTB=1)")
+  # print(VTBTable)
   
-  cat("\n\nTable for Sm(Smoker): \n")
+  # cat("\n\nTable for Sm(Smoker): \n")
   SmTable <- matrix(data = NA, nrow = 1, ncol = 2, byrow = T)
   SmTable[1, 1] <- (length(which(hist[, 5] == 0)) + 1) / (length(which(hist[, 5] == 0)) + 1 + length(which(hist[, 5] == 1)) + 1)
   SmTable[1, 2] <- (length(which(hist[, 5] == 1)) + 1) / (length(which(hist[, 5] == 0)) + 1 + length(which(hist[, 5] == 1)) + 1)
-  colnames(SmTable) <- c("Sm = 0", "Sm = 1")
-  print(SmTable)
+  colnames(SmTable) <- c("(Sm=0)", "(Sm=1)")
+  # print(SmTable)
   
-  cat("\n\nTable for TB(Tuberculosis): \n")
+  # cat("\n\nTable for TB(Tuberculosis): \n")
   TBTable <- matrix(data = NA, nrow = 1, ncol = 4, byrow = T)
-  colnames(TBTable) <- c("(VTB = 0 | TB = 0)", "(VTB = 0 | TB = 1)", "(VTB = 1 | TB = 0)", "(VTB = 1 | TB = 1)")
+  colnames(TBTable) <- c("(VTB=0|TB=0)","(VTB=0|TB=1)","(VTB=1|TB=0)","(VTB=1|TB=1)")
   
   tbCol1Val <- length(which(hist[, 3] == 0 & hist[, 4] == 0)) + 1
   tbCol2Val <- length(which(hist[, 3] == 0 & hist[, 4] == 1)) + 1
@@ -41,11 +41,11 @@ learnFunction <- function(hist)
   TBTable[1, 3] <- tbCol3Val / (tbCol3Val + tbCol4Val)
   TBTable[1, 4] <- tbCol4Val / (tbCol3Val + tbCol4Val)
   
-  print(TBTable)
+  # print(TBTable)
   
-  cat("\n\nTable for Br(Bronchitis): \n")
+  # cat("\n\nTable for Br(Bronchitis): \n")
   BrTable <- matrix(data = NA, nrow = 1, ncol = 4, byrow = T)
-  colnames(BrTable) <- c("(Sm = 0 | Br = 0)", "(Sm = 0 | Br = 1)", "(Sm = 1 | Br = 0)", "(Sm = 1 | Br = 1)")
+  colnames(BrTable) <- c("(Sm=0|Br=0)","(Sm=0|Br=1)","(Sm=1|Br=0)","(Sm=1|Br=1)")
   
   brCol1Val <- length(which(hist[, 5] == 0 & hist[, 7] == 0)) + 1
   brCol2Val <- length(which(hist[, 5] == 0 & hist[, 7] == 1)) + 1
@@ -57,11 +57,11 @@ learnFunction <- function(hist)
   BrTable[1, 3] <- brCol3Val / (brCol3Val + brCol4Val)
   BrTable[1, 4] <- brCol4Val / (brCol3Val + brCol4Val)
   
-  print(BrTable)
+  # print(BrTable)
   
-  cat("\n\nTable for LC(Lung Cancer): \n")
+  # cat("\n\nTable for LC(Lung Cancer): \n")
   LCTable <- matrix(data = NA, nrow = 1, ncol = 4, byrow = T)
-  colnames(LCTable) <- c("(Sm = 0 | LC = 0)", "(Sm = 0 | LC = 1)", "(Sm = 1 | LC = 0)", "(Sm = 1 | LC = 1)")
+  colnames(LCTable) <- c("(Sm=0|LC=0)","(Sm=0|LC=1)","(Sm=1|LC=0)","(Sm=1|LC=1)")
   lcCol1Val <- length(which(hist[, 5] == 0 & hist[, 6] == 0)) + 1
   lcCol2Val <- length(which(hist[, 5] == 0 & hist[, 6] == 1)) + 1
   lcCol3Val <- length(which(hist[, 5] == 1 & hist[, 6] == 0)) + 1
@@ -72,12 +72,12 @@ learnFunction <- function(hist)
   LCTable[1, 3] <- lcCol3Val / (lcCol3Val + lcCol4Val)
   LCTable[1, 4] <- lcCol4Val / (lcCol3Val + lcCol4Val)
   
-  print(LCTable)
+  # print(LCTable)
   
-  cat("\n\nTable for Dy(Dyspnea): \n")
+  # cat("\n\nTable for Dy(Dyspnea): \n")
   DyTable <- matrix(data = NA, nrow = 1, ncol = 8, byrow = T)
-  colnames(DyTable) <- c("(LC = 0 | Br = 0 | Dy = 0)", "(LC = 0 | Br = 0 | Dy = 1)", "(LC = 0 | Br = 1 | Dy = 0)", "(LC = 0 | Br = 1 | Dy = 1)",
-                         "(LC = 1 | Br = 0 | Dy = 0)", "(LC = 1 | Br = 0 | Dy = 1)", "(LC = 1 | Br = 1 | Dy = 0)", "(LC = 1 | Br = 1 | Dy = 1)")
+  colnames(DyTable) <- c("(LC=0|Br=0|Dy=0)","(LC=0|Br=0|Dy=1)","(LC=0|Br=1|Dy=0)","(LC=0|Br=1|Dy=1)",
+                         "(LC=1|Br=0|Dy=0)","(LC=1|Br=0|Dy=1)","(LC=1|Br=1|Dy=0)","(LC=1|Br=1|Dy=1)")
   
   dyCol1Val <- length(which(hist[, 6] == 0 & hist[, 7] == 0 & hist[, 9] == 0)) + 1
   dyCol2Val <- length(which(hist[, 6] == 0 & hist[, 7] == 0 & hist[, 9] == 1)) + 1
@@ -100,18 +100,18 @@ learnFunction <- function(hist)
   DyTable[1, 7] <- dyCol7Val / (dyCol7Val + dyCol8Val)
   DyTable[1, 8] <- dyCol8Val / (dyCol7Val + dyCol8Val)
   
-  print(DyTable)
+  # print(DyTable)
   
-  cat("\n\nTable for XR(X - ray result): \n")
+  # cat("\n\nTable for XR(X - ray result): \n")
   XRTable <- matrix(data = NA, nrow = 1, ncol = 16, byrow = T)
-  colnames(XRTable) <- c("(Pn = 0 | TB = 0 | LC = 0 | XR = 0)", "(Pn = 0 | TB = 0 | LC = 0 | XR = 1)", 
-                         "(Pn = 0 | TB = 0 | LC = 1 | XR = 0)", "(Pn = 0 | TB = 0 | LC = 1 | XR = 1)",
-                         "(Pn = 0 | TB = 1 | LC = 0 | XR = 0)", "(Pn = 0 | TB = 1 | LC = 0 | XR = 1)",
-                         "(Pn = 0 | TB = 1 | LC = 1 | XR = 0)", "(Pn = 0 | TB = 1 | LC = 1 | XR = 1)",
-                         "(Pn = 1 | TB = 0 | LC = 0 | XR = 0)", "(Pn = 1 | TB = 0 | LC = 0 | XR = 1)",
-                         "(Pn = 1 | TB = 0 | LC = 1 | XR = 0)", "(Pn = 1 | TB = 0 | LC = 1 | XR = 1)",
-                         "(Pn = 1 | TB = 1 | LC = 0 | XR = 0)", "(Pn = 1 | TB = 1 | LC = 0 | XR = 1)",
-                         "(Pn = 1 | TB = 1 | LC = 1 | XR = 0)", "(Pn = 1 | TB = 1 | LC = 1 | XR = 1)")
+  colnames(XRTable) <- c("(Pn=0|TB=0|LC=0|XR=0)","(Pn=0|TB=0|LC=0|XR=1)",
+                         "(Pn=0|TB=0|LC=1|XR=0)","(Pn=0|TB=0|LC=1|XR=1)",
+                         "(Pn=0|TB=1|LC=0|XR=0)","(Pn=0|TB=1|LC=0|XR=1)",
+                         "(Pn=0|TB=1|LC=1|XR=0)","(Pn=0|TB=1|LC=1|XR=1)",
+                         "(Pn=1|TB=0|LC=0|XR=0)","(Pn=1|TB=0|LC=0|XR=1)",
+                         "(Pn=1|TB=0|LC=1|XR=0)","(Pn=1|TB=0|LC=1|XR=1)",
+                         "(Pn=1|TB=1|LC=0|XR=0)","(Pn=1|TB=1|LC=0|XR=1)",
+                         "(Pn=1|TB=1|LC=1|XR=0)","(Pn=1|TB=1|LC=1|XR=1)")
   
   xrtableCol1Val <- length(which(hist[, 1] == 0 & hist[, 4] == 0 & hist[, 6] == 0 & hist[, 8] == 0)) + 1
   xrtableCol2Val <- length(which(hist[, 1] == 0 & hist[, 4] == 0 & hist[, 6] == 0 & hist[, 8] == 1)) + 1
@@ -154,14 +154,14 @@ learnFunction <- function(hist)
   XRTable[1, 15] <- xrtableCol15Val / (xrtableCol15Val + xrtableCol16Val)
   XRTable[1, 16] <- xrtableCol16Val / (xrtableCol15Val + xrtableCol16Val)
   
-  print(XRTable)
+  # print(XRTable)
 
   # x <- paste("(Pn = ",toString(1), "| TB = 1 | LC = 1)", sep = "")
   # print(x)
   # print(XRTable[, "(Pn = 0 | TB = 0 | LC = 0 | XR = 1)"])
   
   TempTable <- matrix(data = NA, nrow = 1, ncol = 4, byrow = T)
-  colnames(TempTable) <- c("(Mean 0)", "(SD 0)", "(Mean 1)", "(SD 1)")
+  colnames(TempTable) <- c("(Mean=0)", "(SD=0)", "(Mean=1)", "(SD=1)")
   
   mean_0 <- mean(hist[hist[, 1] == 0, 2])
   sd_0 <- sd(hist[hist[, 1] == 0, 2])
@@ -175,8 +175,94 @@ learnFunction <- function(hist)
   TempTable[1, 3] <- mean_1
   TempTable[1, 4] <- sd_1
   
-  cat("\n\nTable for Te(Temperature): \n")
-  print(TempTable)
+  # cat("\n\nTable for Te(Temperature): \n")
+  # print(TempTable)
+  
+  network <- list(Pn = PnTable, Te = TempTable, VTB = VTBTable, TB = TBTable, Sm = SmTable,
+                  LC = LCTable, Br = BrTable, XR = XRTable, Dy = DyTable)
+  
+  return(network)
 }
 
-learnFunction(hist)
+calculateProbability <- function(network, case)
+{
+  # P(Pn =1) P(Te = 38.73447|Pn =1) P(VTB=0)P(TB=0|VTB=0)
+  # P(Sm =1)P(LC=1|Sm=1)P(Br=0|Sm=1) P(XR=1|Pn=1,TB=0,LC=1) P(Dy=0|LC=1,Br=0)
+  
+  # (Pn=0|TB=0|LC=0|XR=0)
+  # print(XRTable[, "(Pn = 0 | TB = 0 | LC = 0 | XR = 1)"])
+  #x <- paste("(Pn = ",toString(1), "| TB = 1 | LC = 1)", sep = "")
+  
+  # print(colnames(case))
+  cat("\n")
+  print("Table from network: ")
+  print(network$Dy)
+  
+  # (Pn=0)
+  colName <- paste("(Pn=", toString(case[1, 1]),")", sep = "")
+  # cat("\nThis is colName: ", colName)
+  probPn <- network$Pn[, colName]
+  cat("\nProb Pn: ", probPn)
+  
+  
+  if(case[1, 1] == 0)
+  {
+    probTe <- dnorm(case[1, 2], mean = network$Te[1, 1], sd = network$Te[1, 2])
+  }
+  else
+  {
+    probTe <- dnorm(case[1, 2], mean = network$Te[1, 3], sd = network$Te[1, 4])
+  }
+  
+  cat("\nProb TE: ", probTe)
+  
+  colName <- paste("(VTB=", toString(case[1, 3]),")", sep = "")
+  probVTB <- network$VTB[, colName]
+  cat("\nProb VTB: ", probVTB)
+  
+  colName <- paste("(VTB=", toString(case[1, 3]), "|TB=", toString(case[1, 4]), ")", sep = "")
+  probTB <- network$TB[, colName]
+  cat("\nProb TB: ", probTB)
+  
+  colName <- paste("(Sm=", toString(case[1, 5]), ")", sep = "")
+  probSm <- network$Sm[, colName]
+  cat("\nProb Sm: ", probSm)
+  
+  colName <- paste("(Sm=", toString(case[1, 5]), "|LC=", toString(case[1, 6]), ")", sep = "")
+  probLC <- network$LC[, colName]
+  cat("\nProb LC: ", probLC)
+  
+  colName <- paste("(Sm=", toString(case[1, 5]), "|Br=", toString(case[1, 7]), ")", sep = "")
+  probBr <- network$Br[, colName]
+  cat("\nProb Br: ", probBr)
+  
+  colName <- paste("(Pn=", toString(case[1, 1]), "|TB=", toString(case[1, 4]),
+                   "|LC=", toString(case[1, 6]), "|XR=", toString(case[1, 8]), ")", sep = "")
+  probXR <- network$XR[, colName]
+  cat("\nProb XR: ", probXR)
+  
+  colName <- paste("(LC=", toString(case[1, 6]), "|Br=", toString(case[1, 7]),
+                   "|Dy=", toString(case[1, 9]), ")", sep = "")
+  probDy <- network$Dy[, colName]
+  cat("\nProb Dy: ", probDy)
+  
+  prob <- probPn * probTe * probVTB * probTB * probSm * probLC * probBr * probXR * probDy
+  
+  cat("\nprob: ", prob)
+}
+
+diagnosFunction <- function(network, case)
+{
+  case[1, 1] <- 0#sample(0 : 1, 1)
+  case[1, 4] <- 0#sample(0 : 1, 1)
+  case[1, 6] <- 0#sample(0 : 1, 1)
+  case[1, 7] <- 1#sample(0 : 1, 1)
+  
+  print(case)
+  
+  calculateProbability(network, case)
+}
+
+network <- learnFunction(hist)
+
+diagnosFunction(network, cases[1, ])
