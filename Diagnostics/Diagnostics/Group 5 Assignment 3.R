@@ -184,26 +184,14 @@ learnFunction <- function(hist)
   return(network)
 }
 
-calculateProbability <- function(network, case)
+getProbability <- function(network, case)
 {
-  # P(Pn =1) P(Te = 38.73447|Pn =1) P(VTB=0)P(TB=0|VTB=0)
-  # P(Sm =1)P(LC=1|Sm=1)P(Br=0|Sm=1) P(XR=1|Pn=1,TB=0,LC=1) P(Dy=0|LC=1,Br=0)
-  
-  # (Pn=0|TB=0|LC=0|XR=0)
-  # print(XRTable[, "(Pn = 0 | TB = 0 | LC = 0 | XR = 1)"])
-  #x <- paste("(Pn = ",toString(1), "| TB = 1 | LC = 1)", sep = "")
-  
-  # print(colnames(case))
   cat("\n")
-  print("Table from network: ")
-  print(network$Dy)
+  # print("Table from network: ")
+  # print(network$Dy)
   
-  # (Pn=0)
   colName <- paste("(Pn=", toString(case[1, 1]),")", sep = "")
-  # cat("\nThis is colName: ", colName)
   probPn <- network$Pn[, colName]
-  cat("\nProb Pn: ", probPn)
-  
   
   if(case[1, 1] == 0)
   {
@@ -214,55 +202,112 @@ calculateProbability <- function(network, case)
     probTe <- dnorm(case[1, 2], mean = network$Te[1, 3], sd = network$Te[1, 4])
   }
   
-  cat("\nProb TE: ", probTe)
-  
   colName <- paste("(VTB=", toString(case[1, 3]),")", sep = "")
   probVTB <- network$VTB[, colName]
-  cat("\nProb VTB: ", probVTB)
   
   colName <- paste("(VTB=", toString(case[1, 3]), "|TB=", toString(case[1, 4]), ")", sep = "")
   probTB <- network$TB[, colName]
-  cat("\nProb TB: ", probTB)
   
   colName <- paste("(Sm=", toString(case[1, 5]), ")", sep = "")
   probSm <- network$Sm[, colName]
-  cat("\nProb Sm: ", probSm)
   
   colName <- paste("(Sm=", toString(case[1, 5]), "|LC=", toString(case[1, 6]), ")", sep = "")
   probLC <- network$LC[, colName]
-  cat("\nProb LC: ", probLC)
   
   colName <- paste("(Sm=", toString(case[1, 5]), "|Br=", toString(case[1, 7]), ")", sep = "")
   probBr <- network$Br[, colName]
-  cat("\nProb Br: ", probBr)
   
   colName <- paste("(Pn=", toString(case[1, 1]), "|TB=", toString(case[1, 4]),
                    "|LC=", toString(case[1, 6]), "|XR=", toString(case[1, 8]), ")", sep = "")
   probXR <- network$XR[, colName]
-  cat("\nProb XR: ", probXR)
-  
+
   colName <- paste("(LC=", toString(case[1, 6]), "|Br=", toString(case[1, 7]),
                    "|Dy=", toString(case[1, 9]), ")", sep = "")
   probDy <- network$Dy[, colName]
-  cat("\nProb Dy: ", probDy)
   
   prob <- probPn * probTe * probVTB * probTB * probSm * probLC * probBr * probXR * probDy
   
-  cat("\nprob: ", prob)
+  cat("\nProb Pn: ", probPn)
+  cat("\nProb TE: ", probTe)
+  cat("\nProb VTB: ", probVTB)
+  cat("\nProb TB: ", probTB)
+  cat("\nProb Sm: ", probSm)
+  cat("\nProb LC: ", probLC)
+  cat("\nProb Br: ", probBr)
+  cat("\nProb XR: ", probXR)
+  cat("\nProb Dy: ", probDy)
+  cat("\nprob: ", prob, "\n")
+  
+  return(prob)
 }
 
-diagnosFunction <- function(network, case)
+diagnoseFunction <- function(network, case)
 {
+  diseasesIndex <- which(is.na(case))#case[, is.na(case[1, ])]
+  cat("\nThese are the diseases: ", diseasesIndex, "\n\n")
+  
+  # for(i in 1 : length(diseasesIndex))
+  # {
+  #   case[1, diseasesIndex[i]] <- sample(0 : 1, 1)
+  # }
+  
   case[1, 1] <- 0#sample(0 : 1, 1)
   case[1, 4] <- 0#sample(0 : 1, 1)
   case[1, 6] <- 0#sample(0 : 1, 1)
   case[1, 7] <- 1#sample(0 : 1, 1)
   
-  print(case)
+  oldCase <- case
+  newCase <- oldCase
   
-  calculateProbability(network, case)
+  pOld <- getProbability(network, oldCase)
+  
+  sampleMatrix <- matrix(data = NA, nrow = 10000, ncol = 9, byrow = T)
+  
+  #start sampling data from here.
+  
+  for(i in 1 : length(diseasesIndex))
+  {
+    newCase <- oldCase
+    
+    if(newCase[1, diseasesIndex[i]] == 0)newCase[1, diseasesIndex[i]] <- 1
+    else newCase[1, diseasesIndex[i]] <- 0
+    
+    pNew <- getProbability(network, newCase)
+    
+    if(pNew > pOld)
+    {
+      pOld <- pNew
+      oldCase <- newCase
+    }
+    else
+    {
+      pNewBypOld <- pNew / pOld
+      if(runif(1, 0, 1) < pNewBypOld)
+      {
+        pOld <- pNew
+        oldCase <- newCase
+      }
+    }
+  
+  # print("oldCase: ")
+  # print(oldCase)
+  # cat("newCase: ")
+  # print(newCase)
+    
+  }
+  
+  temp <- matrix(unlist(oldCase), nrow = 1, ncol = 9, byrow = T)
+  sampleMatrix[1,] <- temp[1,]
+  
+  # print("oldCase")
+  # print(oldCase)
+  # print(typeof(oldCase))
+  # cat("\noldCase: ", oldCase[1, 2])
+  # cat("\nThis is temp: ", temp)
+  
+  print(sampleMatrix)
 }
 
 network <- learnFunction(hist)
 
-diagnosFunction(network, cases[1, ])
+diagnoseFunction(network, cases[1, ])
