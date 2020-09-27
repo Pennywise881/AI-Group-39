@@ -186,7 +186,7 @@ learnFunction <- function(hist)
 
 getProbability <- function(network, case)
 {
-  cat("\n")
+
   # print("Table from network: ")
   # print(network$Dy)
   
@@ -227,87 +227,111 @@ getProbability <- function(network, case)
   
   prob <- probPn * probTe * probVTB * probTB * probSm * probLC * probBr * probXR * probDy
   
-  cat("\nProb Pn: ", probPn)
-  cat("\nProb TE: ", probTe)
-  cat("\nProb VTB: ", probVTB)
-  cat("\nProb TB: ", probTB)
-  cat("\nProb Sm: ", probSm)
-  cat("\nProb LC: ", probLC)
-  cat("\nProb Br: ", probBr)
-  cat("\nProb XR: ", probXR)
-  cat("\nProb Dy: ", probDy)
-  cat("\nprob: ", prob, "\n")
+  # cat("\n")
+  # cat("\nProb Pn: ", probPn)
+  # cat("\nProb TE: ", probTe)
+  # cat("\nProb VTB: ", probVTB)
+  # cat("\nProb TB: ", probTB)
+  # cat("\nProb Sm: ", probSm)
+  # cat("\nProb LC: ", probLC)
+  # cat("\nProb Br: ", probBr)
+  # cat("\nProb XR: ", probXR)
+  # cat("\nProb Dy: ", probDy)
+  # cat("\nprob: ", prob, "\n")
   
   return(prob)
 }
 
 diagnoseFunction <- function(network, case)
 {
-  diseasesIndex <- which(is.na(case))#case[, is.na(case[1, ])]
-  cat("\nThese are the diseases: ", diseasesIndex, "\n\n")
+  # print(colnames(case))
+  diseasesIndex <- which(is.na(case))
+  # cat("\nThese are the diseases: ", diseasesIndex, "\n\n")
   
-  # for(i in 1 : length(diseasesIndex))
-  # {
-  #   case[1, diseasesIndex[i]] <- sample(0 : 1, 1)
-  # }
+  # print("This is case: ")
+  # print(case)
   
-  case[1, 1] <- 0#sample(0 : 1, 1)
-  case[1, 4] <- 0#sample(0 : 1, 1)
-  case[1, 6] <- 0#sample(0 : 1, 1)
-  case[1, 7] <- 1#sample(0 : 1, 1)
+  for(i in 1 : length(diseasesIndex))
+  {
+    case[1, diseasesIndex[i]] <- sample(0 : 1, 1)
+  }
+  # print("This is case: ")
+  # print(case)
+  
+  # case[1, 1] <- 0#sample(0 : 1, 1)
+  # case[1, 4] <- 0#sample(0 : 1, 1)
+  # case[1, 6] <- 0#sample(0 : 1, 1)
+  # case[1, 7] <- 1#sample(0 : 1, 1)
   
   oldCase <- case
   newCase <- oldCase
   
   pOld <- getProbability(network, oldCase)
   
-  sampleMatrix <- matrix(data = NA, nrow = 10000, ncol = 9, byrow = T)
+  numberOfSamples <- 5000
+  sampleMatrix <- matrix(data = NA, nrow = numberOfSamples, ncol = 9, byrow = T)
+  colnames(sampleMatrix) <- c("Pn","Te","VTB","TB","Sm","LC","Br","XR","Dy")
   
-  #start sampling data from here.
-  
-  for(i in 1 : length(diseasesIndex))
+  for(sample in 1 : numberOfSamples)
   {
-    newCase <- oldCase
-    
-    if(newCase[1, diseasesIndex[i]] == 0)newCase[1, diseasesIndex[i]] <- 1
-    else newCase[1, diseasesIndex[i]] <- 0
-    
-    pNew <- getProbability(network, newCase)
-    
-    if(pNew > pOld)
+    for(i in 1 : length(diseasesIndex))
     {
-      pOld <- pNew
-      oldCase <- newCase
-    }
-    else
-    {
-      pNewBypOld <- pNew / pOld
-      if(runif(1, 0, 1) < pNewBypOld)
+      newCase <- oldCase
+      
+      if(newCase[1, diseasesIndex[i]] == 0)newCase[1, diseasesIndex[i]] <- 1
+      else newCase[1, diseasesIndex[i]] <- 0
+      
+      pNew <- getProbability(network, newCase)
+      
+      if(pNew > pOld)
       {
         pOld <- pNew
         oldCase <- newCase
       }
+      else
+      {
+        pNewBypOld <- pNew / pOld
+        if(runif(1, 0, 1) < pNewBypOld)
+        {
+          pOld <- pNew
+          oldCase <- newCase
+        }
+      }
+      
     }
-  
-  # print("oldCase: ")
-  # print(oldCase)
-  # cat("newCase: ")
-  # print(newCase)
     
+    temp <- matrix(unlist(oldCase), nrow = 1, ncol = 9, byrow = T)
+    sampleMatrix[sample,] <- temp[1,]
   }
   
-  temp <- matrix(unlist(oldCase), nrow = 1, ncol = 9, byrow = T)
-  sampleMatrix[1,] <- temp[1,]
+  # print(sampleMatrix)
+  # cat("Number of rows to remove: ", numberOfSamples * 0.1, "\n")
   
-  # print("oldCase")
-  # print(oldCase)
-  # print(typeof(oldCase))
-  # cat("\noldCase: ", oldCase[1, 2])
-  # cat("\nThis is temp: ", temp)
+  # mat <- matrix(data = sample.int(10, 100, replace = T), nrow = 10, ncol = 5, byrow = T)
+  # print(mat)
+  # 
+  # mat <- tail(mat, -5)
+  # print(mat)
+  sampleMatrix <- tail(sampleMatrix, -(numberOfSamples * 0.1))
   
-  print(sampleMatrix)
+  mat <- matrix(data = NA, nrow = 1, ncol = 4, byrow = T)
+  # colnames(mat) <- c("Pn", "TB", "LC", "Br")
+  
+  # PnTable[1, 1] <- (length(which(hist[, 1] == 0)) + 1) / (length(which(hist[, 1] == 0)) + 1 + length(which(hist[, 1] == 1)) + 1)
+  mat[1, 1] <- (length(which(sampleMatrix[, 1] == 1))) / numberOfSamples
+  mat[1, 2] <- (length(which(sampleMatrix[, 4] == 1))) / numberOfSamples
+  mat[1, 3] <- (length(which(sampleMatrix[, 6] == 1))) / numberOfSamples
+  mat[1, 4] <- (length(which(sampleMatrix[, 7] == 1))) / numberOfSamples
+  
+  return(mat)
 }
 
+# print(cases[1,])
 network <- learnFunction(hist)
 
-diagnoseFunction(network, cases[1, ])
+for(i in 1 : 10)
+{
+  foo <- diagnoseFunction(network, cases[i, ])
+  print(foo)
+}
+
