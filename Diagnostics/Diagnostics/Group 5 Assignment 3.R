@@ -296,12 +296,14 @@ diagnoseFunction <- function(network, cases)
       temp <- matrix(unlist(oldCase), nrow = 1, ncol = 9, byrow = T)
       sampleMatrix[sample,] <- temp[1,]
     }
-    sampleMatrix <- tail(sampleMatrix, -(numberOfSamples * 0.1))
+    
+    burn <- numberOfSamples * 0.1
+    sampleMatrix <- tail(sampleMatrix, -burn)
 
-    mat[caseNumber, 1] <- (length(which(sampleMatrix[, 1] == 1))) / numberOfSamples
-    mat[caseNumber, 2] <- (length(which(sampleMatrix[, 4] == 1))) / numberOfSamples
-    mat[caseNumber, 3] <- (length(which(sampleMatrix[, 6] == 1))) / numberOfSamples
-    mat[caseNumber, 4] <- (length(which(sampleMatrix[, 7] == 1))) / numberOfSamples
+    mat[caseNumber, 1] <- (length(which(sampleMatrix[, 1] == 1))) / (numberOfSamples - burn) 
+    mat[caseNumber, 2] <- (length(which(sampleMatrix[, 4] == 1))) / (numberOfSamples - burn)
+    mat[caseNumber, 3] <- (length(which(sampleMatrix[, 6] == 1))) / (numberOfSamples - burn)
+    mat[caseNumber, 4] <- (length(which(sampleMatrix[, 7] == 1))) / (numberOfSamples - burn)
   }
   
   return(mat)
