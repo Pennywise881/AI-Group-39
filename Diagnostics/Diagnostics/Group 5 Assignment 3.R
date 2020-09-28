@@ -245,6 +245,10 @@ getProbability <- function(network, case)
 diagnoseFunction <- function(network, cases)
 {
   mat <- matrix(data = NA, nrow = dim(cases)[1], ncol = 4, byrow = T)
+  numberOfSamples <- 1000
+  randomNumbersArray <- runif(numberOfSamples*dim(cases)[1]*4, min=0, max=1)
+  # print(length(randomNumbersArray))
+  count <- 1
   
   for(caseNumber in 1 : dim(cases)[1])
   {
@@ -261,7 +265,6 @@ diagnoseFunction <- function(network, cases)
 
     pOld <- getProbability(network, oldCase)
 
-    numberOfSamples <- 1000
     sampleMatrix <- matrix(data = NA, nrow = numberOfSamples, ncol = 9, byrow = T)
     # colnames(sampleMatrix) <- c("Pn","Te","VTB","TB","Sm","LC","Br","XR","Dy")
 
@@ -284,11 +287,17 @@ diagnoseFunction <- function(network, cases)
         else
         {
           pNewBypOld <- pNew / pOld
-          if(runif(1, 0, 1) < pNewBypOld)
+          if(randomNumbersArray[count] < pNewBypOld)
           {
             pOld <- pNew
             oldCase <- newCase
           }
+          count <- count + 1
+          # if(runif(1, 0, 1) < pNewBypOld)
+          # {
+          #   pOld <- pNew
+          #   oldCase <- newCase
+          # }
         }
 
       }
@@ -318,4 +327,8 @@ runDiagnostics(learnFunction, diagnoseFunction, verbose = 2)
 # generate a random number beween 0 and 1
 # x <- sample(0:1, 1)
 # print(x)
+
+# foo <- runif(1000*10*4, min=0, max=1)
+# print(foo)
+# print(foo[9])
 
