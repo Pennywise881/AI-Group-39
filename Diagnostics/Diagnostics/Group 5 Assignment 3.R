@@ -1,33 +1,22 @@
 library(Diagnostics)
 
-# foo <- matrix(data = NA, nrow = 8, ncol = 2, byrow = T)
-
 learnFunction <- function(hist)
 {
-  # print(names(hist))
-  
-  # cat("Table for Pn(Pneumonia): \n")
   PnTable <- matrix(data = NA, nrow = 1, ncol = 2, byrow = T)
   PnTable[1, 1] <- (length(which(hist[, 1] == 0)) + 1) / (length(which(hist[, 1] == 0)) + 1 + length(which(hist[, 1] == 1)) + 1)
   PnTable[1, 2] <- (length(which(hist[, 1] == 1)) + 1) / (length(which(hist[, 1] == 0)) + 1 + length(which(hist[, 1] == 1)) + 1)
   colnames(PnTable) <- c("(Pn=0)", "(Pn=1)")
-  # print(PnTable)
-  
-  # cat("\n\nTable for VTB(Visited a TB location): \n")
+
   VTBTable <- matrix(data = NA, nrow = 1, ncol = 2, byrow = T)
   VTBTable[1, 1] <- (length(which(hist[, 3] == 0)) + 1) / (length(which(hist[, 3] == 0)) + 1 + length(which(hist[, 3] == 1)) + 1)
   VTBTable[1, 2] <- (length(which(hist[, 3] == 1)) + 1) / (length(which(hist[, 3] == 0)) + 1 + length(which(hist[, 3] == 1)) + 1)
   colnames(VTBTable) <- c("(VTB=0)", "(VTB=1)")
-  # print(VTBTable)
-  
-  # cat("\n\nTable for Sm(Smoker): \n")
+
   SmTable <- matrix(data = NA, nrow = 1, ncol = 2, byrow = T)
   SmTable[1, 1] <- (length(which(hist[, 5] == 0)) + 1) / (length(which(hist[, 5] == 0)) + 1 + length(which(hist[, 5] == 1)) + 1)
   SmTable[1, 2] <- (length(which(hist[, 5] == 1)) + 1) / (length(which(hist[, 5] == 0)) + 1 + length(which(hist[, 5] == 1)) + 1)
   colnames(SmTable) <- c("(Sm=0)", "(Sm=1)")
-  # print(SmTable)
-  
-  # cat("\n\nTable for TB(Tuberculosis): \n")
+
   TBTable <- matrix(data = NA, nrow = 1, ncol = 4, byrow = T)
   colnames(TBTable) <- c("(VTB=0|TB=0)","(VTB=0|TB=1)","(VTB=1|TB=0)","(VTB=1|TB=1)")
   
@@ -40,10 +29,7 @@ learnFunction <- function(hist)
   TBTable[1, 2] <- tbCol2Val / (tbCol1Val + tbCol2Val)
   TBTable[1, 3] <- tbCol3Val / (tbCol3Val + tbCol4Val)
   TBTable[1, 4] <- tbCol4Val / (tbCol3Val + tbCol4Val)
-  
-  # print(TBTable)
-  
-  # cat("\n\nTable for Br(Bronchitis): \n")
+
   BrTable <- matrix(data = NA, nrow = 1, ncol = 4, byrow = T)
   colnames(BrTable) <- c("(Sm=0|Br=0)","(Sm=0|Br=1)","(Sm=1|Br=0)","(Sm=1|Br=1)")
   
@@ -56,10 +42,7 @@ learnFunction <- function(hist)
   BrTable[1, 2] <- brCol2Val / (brCol1Val + brCol2Val)
   BrTable[1, 3] <- brCol3Val / (brCol3Val + brCol4Val)
   BrTable[1, 4] <- brCol4Val / (brCol3Val + brCol4Val)
-  
-  # print(BrTable)
-  
-  # cat("\n\nTable for LC(Lung Cancer): \n")
+
   LCTable <- matrix(data = NA, nrow = 1, ncol = 4, byrow = T)
   colnames(LCTable) <- c("(Sm=0|LC=0)","(Sm=0|LC=1)","(Sm=1|LC=0)","(Sm=1|LC=1)")
   lcCol1Val <- length(which(hist[, 5] == 0 & hist[, 6] == 0)) + 1
@@ -72,9 +55,6 @@ learnFunction <- function(hist)
   LCTable[1, 3] <- lcCol3Val / (lcCol3Val + lcCol4Val)
   LCTable[1, 4] <- lcCol4Val / (lcCol3Val + lcCol4Val)
   
-  # print(LCTable)
-  
-  # cat("\n\nTable for Dy(Dyspnea): \n")
   DyTable <- matrix(data = NA, nrow = 1, ncol = 8, byrow = T)
   colnames(DyTable) <- c("(LC=0|Br=0|Dy=0)","(LC=0|Br=0|Dy=1)","(LC=0|Br=1|Dy=0)","(LC=0|Br=1|Dy=1)",
                          "(LC=1|Br=0|Dy=0)","(LC=1|Br=0|Dy=1)","(LC=1|Br=1|Dy=0)","(LC=1|Br=1|Dy=1)")
@@ -99,10 +79,7 @@ learnFunction <- function(hist)
   DyTable[1, 6] <- dyCol6Val / (dyCol5Val + dyCol6Val)
   DyTable[1, 7] <- dyCol7Val / (dyCol7Val + dyCol8Val)
   DyTable[1, 8] <- dyCol8Val / (dyCol7Val + dyCol8Val)
-  
-  # print(DyTable)
-  
-  # cat("\n\nTable for XR(X - ray result): \n")
+
   XRTable <- matrix(data = NA, nrow = 1, ncol = 16, byrow = T)
   colnames(XRTable) <- c("(Pn=0|TB=0|LC=0|XR=0)","(Pn=0|TB=0|LC=0|XR=1)",
                          "(Pn=0|TB=0|LC=1|XR=0)","(Pn=0|TB=0|LC=1|XR=1)",
@@ -154,12 +131,6 @@ learnFunction <- function(hist)
   XRTable[1, 15] <- xrtableCol15Val / (xrtableCol15Val + xrtableCol16Val)
   XRTable[1, 16] <- xrtableCol16Val / (xrtableCol15Val + xrtableCol16Val)
   
-  # print(XRTable)
-
-  # x <- paste("(Pn = ",toString(1), "| TB = 1 | LC = 1)", sep = "")
-  # print(x)
-  # print(XRTable[, "(Pn = 0 | TB = 0 | LC = 0 | XR = 1)"])
-  
   TempTable <- matrix(data = NA, nrow = 1, ncol = 4, byrow = T)
   colnames(TempTable) <- c("(Mean=0)", "(SD=0)", "(Mean=1)", "(SD=1)")
   
@@ -167,16 +138,11 @@ learnFunction <- function(hist)
   sd_0 <- sd(hist[hist[, 1] == 0, 2])
   mean_1 <- mean(hist[hist[, 1] == 1, 2])
   sd_1 <- sd(hist[hist[, 1] == 1, 2])
-  # cat("\n\nmean: ", mean_0)
-  # cat("\n\nsd: ", sd_0)
   
   TempTable[1, 1] <- mean_0
   TempTable[1, 2] <- sd_0
   TempTable[1, 3] <- mean_1
   TempTable[1, 4] <- sd_1
-  
-  # cat("\n\nTable for Te(Temperature): \n")
-  # print(TempTable)
   
   network <- list(Pn = PnTable, Te = TempTable, VTB = VTBTable, TB = TBTable, Sm = SmTable,
                   LC = LCTable, Br = BrTable, XR = XRTable, Dy = DyTable)
@@ -186,10 +152,6 @@ learnFunction <- function(hist)
 
 getProbability <- function(network, case)
 {
-
-  # print("Table from network: ")
-  # print(network$Dy)
-  
   colName <- paste("(Pn=", toString(case[1, 1]),")", sep = "")
   probPn <- network$Pn[, colName]
   
@@ -227,18 +189,6 @@ getProbability <- function(network, case)
   
   prob <- probPn * probTe * probVTB * probTB * probSm * probLC * probBr * probXR * probDy
   
-  # cat("\n")
-  # cat("\nProb Pn: ", probPn)
-  # cat("\nProb TE: ", probTe)
-  # cat("\nProb VTB: ", probVTB)
-  # cat("\nProb TB: ", probTB)
-  # cat("\nProb Sm: ", probSm)
-  # cat("\nProb LC: ", probLC)
-  # cat("\nProb Br: ", probBr)
-  # cat("\nProb XR: ", probXR)
-  # cat("\nProb Dy: ", probDy)
-  # cat("\nprob: ", prob, "\n")
-  
   return(prob)
 }
 
@@ -246,9 +196,11 @@ diagnoseFunction <- function(network, cases)
 {
   mat <- matrix(data = NA, nrow = dim(cases)[1], ncol = 4, byrow = T)
   numberOfSamples <- 1000
-  randomNumbersArray <- runif(numberOfSamples*dim(cases)[1]*4, min=0, max=1)
+  
+  ## using vector of random values ## 
+  # randomNumbersArray <- runif(numberOfSamples*dim(cases)[1]*4, min=0, max=1)
   # print(length(randomNumbersArray))
-  count <- 1
+  # count <- 1
   
   for(caseNumber in 1 : dim(cases)[1])
   {
@@ -266,7 +218,6 @@ diagnoseFunction <- function(network, cases)
     pOld <- getProbability(network, oldCase)
 
     sampleMatrix <- matrix(data = NA, nrow = numberOfSamples, ncol = 9, byrow = T)
-    # colnames(sampleMatrix) <- c("Pn","Te","VTB","TB","Sm","LC","Br","XR","Dy")
 
     for(sample in 1 : numberOfSamples)
     {
@@ -287,17 +238,17 @@ diagnoseFunction <- function(network, cases)
         else
         {
           pNewBypOld <- pNew / pOld
-          if(randomNumbersArray[count] < pNewBypOld)
-          {
-            pOld <- pNew
-            oldCase <- newCase
-          }
-          count <- count + 1
-          # if(runif(1, 0, 1) < pNewBypOld)
+          # if(randomNumbersArray[count] < pNewBypOld)
           # {
           #   pOld <- pNew
           #   oldCase <- newCase
           # }
+          # count <- count + 1
+          if(runif(1, 0, 1) < pNewBypOld)
+          {
+            pOld <- pNew
+            oldCase <- newCase
+          }
         }
 
       }
@@ -319,16 +270,4 @@ diagnoseFunction <- function(network, cases)
 }
 
 runDiagnostics(learnFunction, diagnoseFunction, verbose = 2)
-
-# network <- learnFunction(hist)
-# foo <- diagnoseFunction(network, cases)
-# print(foo)
-
-# generate a random number beween 0 and 1
-# x <- sample(0:1, 1)
-# print(x)
-
-# foo <- runif(1000*10*4, min=0, max=1)
-# print(foo)
-# print(foo[9])
 
